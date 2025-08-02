@@ -1,54 +1,124 @@
-import argparse
-import os
-from lumix.common.lang import get_translator
+#!/usr/bin/env python3
+"""
+Module parser per conversione temperature.
+Definisce una funzione parse(lang, params) che valida i parametri localizzati
+e invoca temps.convert(src_unit, dst_unit, value) passando sempre il valore con il punto come separatore decimale.
+"""
 
-def get_parser(lang="en"):
-    print("[DEBUG] Parsed lang =", lang)
+import sys
+import re
+try:
+    from .convert import convert
+except ImportError:
+    from convert import convert
 
-    import sys
-    from argcomplete.completers import ChoicesCompleter
+# Codici ANSI per colorazione
+_GREEN = '\033[32m'
+_RESET = '\033[0m'
 
-    # Determina la lingua guardando sys.argv se possibile
-    for i, arg in enumerate(sys.argv):
-        if arg in ["--it", "--es", "--fr", "--jp", "--en"]:
-            lang = arg[2:]
-            break
+# Unità ammesse
+VALID_UNITS = {'C', 'F', 'K'}
 
-    # Set up i18n
-    localedir = os.path.join(os.path.dirname(__file__), "languages")
-    _ = get_translator("messages", lang, localedir)
+# Configurazione per keyword e regex decimal separator per lingua
+LANG_CONFIG = {
+    'it': {
+        'from_kw': 'da',
+        'to_kw': 'a',
+        'value_pattern': r'^-?[0-9]+(,[0-9]+)?$',
+        'errors': {
+            'syntax': "❌ Sintassi errata per lingua 'it': usa 'da' e 'a'",
+            'unit': "❌ Unità non valida. Usa solo C, F, K",
+            'value': "❌ Valore non valido: in italiano si usa la virgola (es: 36,5)",
+        },
+    },
+    'fr': {
+        'from_kw': 'de',
+        'to_kw': 'à',
+        'value_pattern': r'^-?[0-9]+(,[0-9]+)?$',
+        'errors': {
+            'syntax': "❌ Syntaxe invalide pour 'fr' : utilisez 'de' et 'à'",
+            'unit': "❌ Unités invalides. Utilisez C, F, K",
+            'value': "❌ Valeur invalide : utilisez la virgule (ex: 36,5)",
+        },
+    },
+    'es': {
+        'from_kw': 'de',
+        'to_kw': 'a',
+        'value_pattern': r'^-?[0-9]+(,[0-9]+)?$',
+        'errors': {
+            'syntax': "❌ Sintaxis incorrecta para 'es': usa 'de' y 'a'",
+            'unit': "❌ Unidad no válida. Usa C, F, K",
+            'value': "❌ Valor no válido: usa coma decimal (ej: 36,5)",
+        },
+    },
+    'en': {
+        'from_kw': 'from',
+        'to_kw': 'to',
+        'value_pattern': r'^-?[0-9]+(\.[0-9]+)?$',
+        'errors': {
+            'syntax': "❌ Invalid syntax for 'en': use 'from' and 'to'",
+            'unit': "❌ Invalid units. Use C, F, K",
+            'value': "❌ Invalid value: use dot as decimal separator (e.g. 36.5)",
+        },
+    },
+    'jp': {
+        'from_kw': 'から',
+        'to_kw': 'まで',
+        'value_pattern': r'^-?[0-9]+(\.[0-9]+)?$',
+        'errors': {
+            'syntax': "❌ 無効な構文：'から' と 'まで' を使ってください",
+            'unit': "❌ 単位が無効です。C, F, K を使用してください",
+            'value': "❌ 値が無効です。小数点にはピリオドを使ってください（例: 36.5）",
+        },
+    },
+}
 
-    # Localized option names based on selected language
-    localized_flags = {
-        "en": {"type": "--temp", "from": "--from", "to": "--to"},
-        "it": {"type": "--temperatura", "from": "--da", "to": "--a"},
-        "es": {"type": "--temperatura", "from": "--de", "to": "--a"},
-        "fr": {"type": "--température", "from": "--de", "to": "--à"},
-        "jp": {"type": "--温度", "from": "--から", "to": "--へ"},
-    }
 
-    # Fallback to English if unsupported
-    flags = localized_flags.get(lang, localized_flags["en"])
+def parse(lang, params):
+    """
+    Valida params e invoca temps.convert(src_unit, dst_unit, value_dot).
+    """
+    cfg = LANG_CONFIG.get(lang)
+    if not cfg:
+        print(f"❌ Lingua non supportata: {lang}")
+        sys.exit(1)
 
-    parser = argparse.ArgumentParser(description=_("Temperature converter"))
-    # Use constant value for the 'type' argument to avoid requiring a value
-    parser.add_argument(flags["type"], dest="type", action="store_const", const="temps", help=_("Conversion type"))
-    arg_from = parser.add_argument(flags["from"], dest="src", required=True, help=_("Source unit"))
-    arg_from.completer = ChoicesCompleter(["C", "F", "K"])
-    arg_to = parser.add_argument(flags["to"], dest="dst", required=True, help=_("Target unit"))
-    arg_to.completer = ChoicesCompleter(["C", "F", "K"])
-    parser.add_argument("value", type=float, help=_("Value to convert"))
+    parts = params.split()
+    if len(parts) != 5:
+        print(f"❌ Uso: <lingua> {cfg['from_kw']} <unità_orig> {cfg['to_kw']} <unità_dest> <valore>")
+        sys.exit(1)
 
-    # Autocomplete registration
-    try:
-        import argcomplete
-        argcomplete.autocomplete(parser)
-    except ImportError:
-        pass
+    from_kw, src_unit, to_kw, dst_unit, value_str = parts
 
-    # Debug outputs
-    print("[DEBUG] All parser actions:")
-    for action in parser._actions:
-        print("  ", action.option_strings)
+    # Controllo sintassi keywords
+    if from_kw != cfg['from_kw'] or to_kw != cfg['to_kw']:
+        print(cfg['errors']['syntax'])
+        sys.exit(1)
 
-    return parser
+    # Controllo unità
+    if src_unit not in VALID_UNITS or dst_unit not in VALID_UNITS:
+        print(cfg['errors']['unit'])
+        sys.exit(1)
+
+    # Controllo formato valore
+    if not re.match(cfg['value_pattern'], value_str):
+        print(cfg['errors']['value'])
+        sys.exit(1)
+
+    # Correggiamo il separatore decimale in punto
+    value_dot = value_str.replace(',', '.')
+
+    # Invocazione della funzione convert con unità e valore con punto
+    result = convert(src_unit, dst_unit, value_dot)
+    # Stampa risultato con colore verde
+    print(f"{value_str} {src_unit} --> {_GREEN}{result}{_RESET} {dst_unit}")
+
+
+# Supporto per esecuzione diretta
+if __name__ == '__main__':
+    if len(sys.argv) != 7:
+        print("❌ Uso: ./temps.parser.py <lingua> <from_kw> <unità_orig> <to_kw> <unità_dest> <valore>")
+        sys.exit(1)
+    lang = sys.argv[1]
+    params = ' '.join(sys.argv[2:])
+    parse(lang, params)

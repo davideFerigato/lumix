@@ -1,3 +1,1 @@
-"""
-Funzionalità di conversione temperature (°C, °F, K) per Lumix.
-"""
+from .convert import convert

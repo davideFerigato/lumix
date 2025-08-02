@@ -1,109 +1,238 @@
-import importlib
-import os
+#!/usr/bin/env python3
+"""
+Script di routing per chiamare diversi parser in base alla lingua e al tipo di conversione,
+salvando tutto il testo dopo la seconda parola in una variabile e passandolo al parser.
+Ora, ogni parser riceverà come primo parametro la lingua, seguito dalla stringa di input.
+Uso: python3 script.py <lang> <key> <input...>
+"""
 import sys
+import os
+import subprocess
+
 import argparse
-import gettext
-import argcomplete
-from argcomplete.completers import ChoicesCompleter
+try:
+    import argcomplete
+except ImportError:
+    argcomplete = None
 
-# Mappa delle lingue disponibili
-LANGUAGE_FLAGS = ["--it", "--en", "--es", "--fr", "--jp"]
-LANGUAGE_CODES = {
-    "--it": "it",
-    "--en": "en",
-    "--es": "es",
-    "--fr": "fr",
-    "--jp": "jp"
+# Setup shell autocomplete for lang and key
+def setup_autocomplete():
+    ac_parser = argparse.ArgumentParser(add_help=False)
+    ac_parser.add_argument('lang', choices=list(PARSER_MODULES.keys()))
+    key_arg = ac_parser.add_argument('key')
+    def key_completer(prefix, parsed_args, **kwargs):
+        return [k for k in PARSER_MODULES.get(parsed_args.lang, {}) if k.startswith(prefix)]
+    key_arg.completer = key_completer
+    if argcomplete:
+        argcomplete.autocomplete(ac_parser)
+
+setup_autocomplete()
+
+# Mappatura dei valori ammessi e del relativo modulo parser
+PARSER_MODULES = {
+    'fr': {
+        'devise': 'currency.parser',
+        'température': 'temps.parser',
+        'base': 'base.parser',
+        'poids': 'weight.parser',
+        'longueur': 'length.parser',
+        'volume': 'volume.parser',
+        'surface': 'area.parser',
+        'vitesse': 'speed.parser',
+        'temps': 'time.parser',
+        'énergie': 'energy.parser',
+        'pression': 'pressure.parser',
+        'puissance': 'power.parser',
+        'données': 'data.parser',
+        'débit': 'bitrate.parser',
+        'hash': 'hash.parser',
+        'couleur': 'color.parser',
+        'outilsip': 'iptools.parser',
+        'fuseaux': 'timezones.parser',
+        'date': 'date.parser',
+        'calendrier': 'calendar.parser',
+        'âge': 'age.parser',
+        'motsdepasse': 'passwords.parser',
+        'pays': 'country.parser',
+        'langue': 'language.parser',
+        'symbolesunités': 'unitsymbols.parser',
+        'romain': 'roman.parser',
+        'morse': 'morse.parser',
+        'robotfuseau': 'timezonebot.parser',
+        'parlé': 'spoken.parser',
+        'phonétique': 'phonetic.parser',
+    },
+    'en': {
+        'currency': 'currency.parser',
+        'temperature': 'temps.parser',
+        'base': 'base.parser',
+        'weight': 'weight.parser',
+        'length': 'length.parser',
+        'volume': 'volume.parser',
+        'area': 'area.parser',
+        'speed': 'speed.parser',
+        'time': 'time.parser',
+        'energy': 'energy.parser',
+        'pressure': 'pressure.parser',
+        'power': 'power.parser',
+        'data': 'data.parser',
+        'bitrate': 'bitrate.parser',
+        'hash': 'hash.parser',
+        'color': 'color.parser',
+        'iptools': 'iptools.parser',
+        'timezones': 'timezones.parser',
+        'date': 'date.parser',
+        'calendar': 'calendar.parser',
+        'age': 'age.parser',
+        'passwords': 'passwords.parser',
+        'country': 'country.parser',
+        'language': 'language.parser',
+        'unitsymbols': 'unitsymbols.parser',
+        'roman': 'roman.parser',
+        'morse': 'morse.parser',
+        'timezonebot': 'timezonebot.parser',
+        'spoken': 'spoken.parser',
+        'phonetic': 'phonetic.parser',
+    },
+    'it': {
+        'valuta': 'currency.parser',
+        'temperatura': 'temps.parser',
+        'base': 'base.parser',
+        'peso': 'weight.parser',
+        'lunghezza': 'length.parser',
+        'volume': 'volume.parser',
+        'area': 'area.parser',
+        'velocità': 'speed.parser',
+        'tempo': 'time.parser',
+        'energia': 'energy.parser',
+        'pressione': 'pressure.parser',
+        'potenza': 'power.parser',
+        'dati': 'data.parser',
+        'bitrate': 'bitrate.parser',
+        'hash': 'hash.parser',
+        'colore': 'color.parser',
+        'strumentiip': 'iptools.parser',
+        'fusi': 'timezones.parser',
+        'data': 'date.parser',
+        'calendario': 'calendar.parser',
+        'età': 'age.parser',
+        'password': 'passwords.parser',
+        'paese': 'country.parser',
+        'lingua': 'language.parser',
+        'simboliunita': 'unitsymbols.parser',
+        'romano': 'roman.parser',
+        'morse': 'morse.parser',
+        'timezonebot': 'timezonebot.parser',
+        'parlato': 'spoken.parser',
+        'fonetico': 'phonetic.parser',
+    },
+    'jp': {
+        '通貨': 'currency.parser',
+        '温度': 'temps.parser',
+        '基数': 'base.parser',
+        '重さ': 'weight.parser',
+        '長さ': 'length.parser',
+        '体積': 'volume.parser',
+        '面積': 'area.parser',
+        '速度': 'speed.parser',
+        '時間': 'time.parser',
+        'エネルギー': 'energy.parser',
+        '圧力': 'pressure.parser',
+        '電力': 'power.parser',
+        'データ': 'data.parser',
+        'ビットレート': 'bitrate.parser',
+        'ハッシュ': 'hash.parser',
+        '色': 'color.parser',
+        'IPツール': 'iptools.parser',
+        'タイムゾーン': 'timezones.parser',
+        '日付': 'date.parser',
+        'カレンダー': 'calendar.parser',
+        '年齢': 'age.parser',
+        'パスワード': 'passwords.parser',
+        '国': 'country.parser',
+        '言語': 'language.parser',
+        '単位記号': 'unitsymbols.parser',
+        'ローマ数字': 'roman.parser',
+        'モールス': 'morse.parser',
+        'タイムゾーンボット': 'timezonebot.parser',
+        '話し言葉': 'spoken.parser',
+        '発音記号': 'phonetic.parser',
+    },
+    'es': {
+        'moneda': 'currency.parser',
+        'temperatura': 'temps.parser',
+        'base': 'base.parser',
+        'peso': 'weight.parser',
+        'longitud': 'length.parser',
+        'volumen': 'volume.parser',
+        'área': 'area.parser',
+        'velocidad': 'speed.parser',
+        'tiempo': 'time.parser',
+        'energía': 'energy.parser',
+        'presión': 'pressure.parser',
+        'potencia': 'power.parser',
+        'datos': 'data.parser',
+        'bitrate': 'bitrate.parser',
+        'hash': 'hash.parser',
+        'color': 'color.parser',
+        'herramientasip': 'iptools.parser',
+        'husos': 'timezones.parser',
+        'fecha': 'date.parser',
+        'calendario': 'calendar.parser',
+        'edad': 'age.parser',
+        'contraseñas': 'passwords.parser',
+        'país': 'country.parser',
+        'idioma': 'language.parser',
+        'simbolosunidad': 'unitsymbols.parser',
+        'romano': 'roman.parser',
+        'morse': 'morse.parser',
+        'zonabot': 'timezonebot.parser',
+        'hablado': 'spoken.parser',
+        'fonético': 'phonetic.parser',
+    },
 }
 
-# Alias localizzati delle funzionalità
-TYPE_ALIASES = {
-    "temps": {
-        "en": ["--temp"],
-        "it": ["--temperatura", "--temp"],
-        "es": ["--temperatura", "--temp"],
-        "fr": ["--température", "--temp"],
-        "jp": ["--温度", "--temp"]
-    }
+# Messaggi di errore localizzati
+ERROR_MESSAGES = {
+    'fr': "❌ Valeur '{value}' non valide pour la langue '{lang}'",
+    'en': "❌ Invalid value '{value}' for language '{lang}'",
+    'it': "❌ Valore '{value}' non valido per la lingua '{lang}'",
+    'jp': "❌ 無効な値 '{value}'（日本語）",
+    'es': "❌ Valor '{value}' no válido para el idioma '{lang}'",
 }
 
-
-def run_cli():
-    # Rilevamento lingua: si legge da sys.argv prima di tutto
-    lang = "en"  # default
-    for flag in LANGUAGE_FLAGS:
-        if flag in sys.argv:
-            lang = LANGUAGE_CODES[flag]
-            break
-
-    # Imposta gettext
-    localedir = os.path.join(os.path.dirname(__file__), "lumix", "temps", "languages")
-    gettext.bindtextdomain("messages", localedir)
-    gettext.textdomain("messages")
-    _ = gettext.gettext
-
-    # Crea parser globale
-    parser = argparse.ArgumentParser(description="Lumix CLI")
-
-    # Aggiungi flags lingua (opzionali)
-    for flag in LANGUAGE_FLAGS:
-        parser.add_argument(flag, action="store_const", const=LANGUAGE_CODES[flag], dest="lang", help="Language")
-
-    # Ottieni tutte le opzioni possibili di tipo in base alla lingua
-    def all_type_options(language):
-        result = []
-        for aliases in TYPE_ALIASES.values():
-            result.extend(aliases.get(language, []))
-        return result
-
-    # Aggiungi dinamicamente le opzioni delle funzionalità localizzate
-    for module_name, alias_map in TYPE_ALIASES.items():
-        for opt in alias_map.get(lang, []):
-            parser.add_argument(
-                opt,
-                dest="type",
-                action="store_const",
-                const=module_name,
-                help=_("Conversion type")
-            )
-
-    # Solo se l'utente NON ha specificato una lingua, mostra tutte le opzioni '--type' disponibili
-    if not any(flag in sys.argv for flag in LANGUAGE_FLAGS):
-        parser.add_argument(
-            "--type",
-        ).completer = ChoicesCompleter(all_type_options("en"))
-
-    # Attiva autocompletamento
-    argcomplete.autocomplete(parser)
-
-    args, unknown = parser.parse_known_args()
-
-    if not args.lang:
-        args.lang = lang  # fallback da sys.argv
-
-    print("[DEBUG] args:", args)
-    print("[DEBUG] args.lang:", getattr(args, "lang", None))
-    print("[DEBUG] args.type:", getattr(args, "type", None))
-    print("[DEBUG] unknown:", unknown)
-
-    if not getattr(args, "type", None):
-        print("[ERROR] No conversion type selected.")
-        print("[DEBUG] Available args:", vars(args))
+def main():
+    if len(sys.argv) < 3:
+        print(f"Usage: {sys.argv[0]} <lang> <key> <input...>")
         sys.exit(1)
 
-    modname = args.type
-    try:
-        mod = importlib.import_module(f"lumix.{modname}.parser")
-        parser2 = mod.get_parser(args.lang)
-        try:
-            sub_args = parser2.parse_args(unknown)
-            for k, v in vars(sub_args).items():
-                setattr(args, k, v)
-        except SystemExit as e:
-            print("[ERROR] Failed to parse sub-arguments:", unknown)
-            raise e
-        mod2 = importlib.import_module(f"lumix.{modname}.convert")
-        mod2.run(args)
-    except Exception as e:
-        print("[ERROR] Exception while executing module:", e)
+    lang = sys.argv[1]
+    key = sys.argv[2]
+    # Tutto ciò che segue la seconda parola
+    rest_args = sys.argv[3:]
+    # Uniamo gli argomenti extra in una singola stringa
+    params = ' '.join(rest_args) if rest_args else ''
+
+    modules = PARSER_MODULES.get(lang)
+    if modules is None:
+        print(f"❌ Lingua non riconosciuta: {lang}")
         sys.exit(1)
+
+    module_path = modules.get(key)
+    if module_path is None:
+        msg = ERROR_MESSAGES.get(lang, "❌ Invalid value '{value}' for language '{lang}'")
+        print(msg.format(value=key, lang=lang))
+        sys.exit(1)
+
+    # Invoca lo script parser via subprocess
+    script_dir = os.path.dirname(__file__)
+    # Il percorso del parser si trova in ../<module_path>.py
+    parser_script = os.path.normpath(
+        os.path.join(script_dir, '..', module_path.replace('.', os.sep) + '.py')
+    )
+    cmd = [sys.executable, parser_script, lang] + rest_args
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+if __name__ == '__main__':
+    main()

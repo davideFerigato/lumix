@@ -1,41 +1,60 @@
-from lumix.common.validate import validate_number, validate_temp
-from lumix.common.lang import get_translator
-import os
-import argparse
+#!/usr/bin/env python3
+"""
+Modulo per conversione temperature.
+Definisce la funzione convert(src_unit, dst_unit, val) che:
+  - Riceve src_unit e dst_unit ('C', 'F', 'K'), e val come stringa (con punto come separatore).
+  - Converte val in float, esegue la conversione appropriata.
+  - Restituisce il risultato formattato a 2 decimali, colorato di verde.
+Include anche un main per esecuzione diretta, che gestisce virgola/punto e stampa il risultato completo.
+"""
+import sys
 
-def c_to_f(c): return c * 9 / 5 + 32
-def f_to_c(f): return (f - 32) * 5 / 9
+_VALID_UNITS = {'C', 'F', 'K'}
 
-def run(args):
-    lang = os.environ.get("LANG", "en")[:2]
-    localedir = os.path.join(os.path.dirname(__file__), "languages")
-    _ = get_translator("messages", lang, localedir)
 
-    val = validate_number(args.value)
-    src = validate_temp(args.src)
-    dst = validate_temp(args.dst)
+def convert(src, dst, val):
+    """
+    Converte la temperatura da src a dst.
 
-    if src == "C" and dst == "F":
-        result = c_to_f(val)
-        unit = "°F"
-    elif src == "F" and dst == "C":
-        result = f_to_c(val)
-        unit = "°C"
-    elif src == "C" and dst == "K":
-        result = val + 273.15
-        unit = "K"
-    elif src == "K" and dst == "C":
-        result = val - 273.15
-        unit = "°C"
-    elif src == "F" and dst == "K":
-        result = f_to_c(val) + 273.15
-        unit = "K"
-    elif src == "K" and dst == "F":
-        result = c_to_f(val - 273.15)
-        unit = "°F"
+    Args:
+        src (str): unità sorgente ('C', 'F', 'K').
+        dst (str): unità destinazione ('C', 'F', 'K').
+        val (str or float): valore numerico (se stringa, deve usare il punto come separatore).
+
+    Returns:
+        str: valore convertito formattato a due decimali e colorato di verde,
+             oppure None se input non valido o combinazione non supportata.
+    """
+    # Validazione unità
+    if src not in _VALID_UNITS or dst not in _VALID_UNITS:
+        return None
+
+    # Conversione valore in float
+    try:
+        num = float(val)
+    except (ValueError, TypeError):
+        return None
+
+    # Esegui conversione
+    if src == dst:
+        result = num
+    elif src == 'C' and dst == 'F':
+        result = (num * 9/5) + 32
+    elif src == 'C' and dst == 'K':
+        result = num + 273.15
+    elif src == 'F' and dst == 'C':
+        result = (num - 32) * 5/9
+    elif src == 'F' and dst == 'K':
+        result = ((num - 32) * 5/9) + 273.15
+    elif src == 'K' and dst == 'C':
+        result = num - 273.15
+    elif src == 'K' and dst == 'F':
+        result = ((num - 273.15) * 9/5) + 32
     else:
-        raise ValueError(_("Conversion not supported"))
+        # Combinazione non supportata
+        return None
 
-    print(_("{val} {src} → {res:.2f} {unit}").format(
-        val=val, src=src, res=result, unit=unit
-    ))
+    # Formatta con due decimali
+    formatted = f"{result:.2f}"
+    # Ritorna stringa non colorata
+    return formatted

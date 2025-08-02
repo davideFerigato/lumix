@@ -2,7 +2,7 @@
 
 # lumix
 
-[![CI](https://github.com/USERNAME/lumix/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/lumix/actions/workflows/ci.yml)
+[![CI](https://github.com/davideFerigato/lumix/actions/workflows/ci.yml/badge.svg)](https://github.com/davideFerigato/lumix/actions/workflows/ci.yml)
 [![Docker](https://img.shields.io/badge/docker-supported-blue)](https://github.com/USERNAME/lumix#docker)
 [![PyPI](https://img.shields.io/pypi/v/lumix.svg)](https://pypi.org/project/lumix)
 

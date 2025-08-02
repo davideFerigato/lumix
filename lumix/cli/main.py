@@ -26,7 +26,6 @@ def setup_autocomplete():
     if argcomplete:
         argcomplete.autocomplete(ac_parser)
 
-setup_autocomplete()
 
 # Mappatura dei valori ammessi e del relativo modulo parser
 PARSER_MODULES = {
@@ -235,4 +234,5 @@ def main():
     sys.exit(result.returncode)
 
 if __name__ == '__main__':
+    setup_autocomplete()
     main()

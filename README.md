@@ -136,18 +136,3 @@ docker run --rm lumix --type temp --from C --to K 25
 pytest
 ```
 
----
-
-## 🤝 Contribuire
-
-1. Fork & clone
-2. Crea branch `feature/x`
-3. Aggiungi test e traduzioni
-4. Apri una Pull Request
-
----
-
-## 📝 Licenza
-
-MIT © DMF
-

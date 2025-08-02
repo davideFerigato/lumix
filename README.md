@@ -23,7 +23,7 @@
 - 🌐 **Localizzazione**: supporta **it**, **en**, **es**, **fr**, **jp**.
 - ⚙️ **CLI modulare**: aggiungi facilmente nuovi parser, senza cambiare il core.
 - 🛠️ **Conversioni fisiche**, **utility digitali**, **date/tempo**, **sicurezza**, **geo**, **bonus creativi**.
-- 🖥️ **GUI opzionale** via Tkinter.
+- 🖥️ **GUI opzionale** via Tkinter (in sviluppo).
 
 ---
 
@@ -57,8 +57,12 @@ lumix --help
 
 ## 🔍 Esempi dettagliati
 
-### ⚖️ Conversioni fisiche
-
+- **temperature**: Converte tra Celsius, Fahrenheit, Kelvin.  
+  Esempio: `lumix en temperature from C to F 36.5`  
+- **currency**: Converte tra valute (USD, EUR, GBP, etc.).  
+  Esempio: `lumix en currency from USD to EUR 100`  
+- **base**: Converte tra basi numeriche (dec ↔ bin ↔ hex ↔ oct).  
+  Esempio: `lumix en base from dec to hex 255`  
 - **weight**: `lumix en weight from kg to lb 75` → 75 kg in libbre.
 - **length**: `lumix en length from m to ft 1.80` → 1.80 m in piedi.
 - **volume**: `lumix en volume from l to gal 2` → 2 L in galloni.
@@ -110,6 +114,9 @@ lumix --help
 pip install argcomplete
 eval "$(register-python-argcomplete lumix)"
 # Aggiungi in ~/.bashrc o ~/.zshrc per renderlo permanente
+```
+
+*Nota: Autocompletamento in fase di perfezionamento.*
 ```
 
 ---

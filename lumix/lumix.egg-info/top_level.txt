@@ -1,6 +1,0 @@
-bases
-cli
-common
-currency
-gui
-temps

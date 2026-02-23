@@ -281,8 +281,8 @@ Distributed under the MIT License. See LICENSE for more information.
 
 🙏 Acknowledgements
 
-* Frankfurter API for real‑time exchange rates.
-* argcomplete for shell completion magic.
+* [Frankfurter API](https://frankfurter.dev) for real‑time exchange rates.
+* [argcomplete](https://github.com/kislyuk/argcomplete) for shell completion magic.
 * All contributors and users who make this project better.
 
 Happy converting! 🚀

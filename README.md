@@ -268,8 +268,8 @@ Each module has its own test file (test_<module>.py) to ensure reliability.
 
 Contributions are welcome! Whether you want to add a new converter, improve documentation, or fix a bug, please feel free to open an issue or submit a pull request.
 
-Fork the repository.
-Create a feature branch (git checkout -b feature/amazing-converter).
+1. Fork the repository.
+2. Create a feature branch (git checkout -b feature/amazing-converter).
 Commit your changes (git commit -m 'Add amazing converter').
 Push to the branch (git push origin feature/amazing-converter).
 Open a Pull Request.

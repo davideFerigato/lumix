@@ -270,10 +270,10 @@ Contributions are welcome! Whether you want to add a new converter, improve docu
 
 1. Fork the repository.
 2. Create a feature branch (git checkout -b feature/amazing-converter).
-Commit your changes (git commit -m 'Add amazing converter').
-Push to the branch (git push origin feature/amazing-converter).
-Open a Pull Request.
-Please make sure to update tests as appropriate.
+3. Commit your changes (git commit -m 'Add amazing converter').
+4. Push to the branch (git push origin feature/amazing-converter).
+5. Open a Pull Request.
+6. Please make sure to update tests as appropriate.
 
 📄 License
 
@@ -281,7 +281,8 @@ Distributed under the MIT License. See LICENSE for more information.
 
 🙏 Acknowledgements
 
-Frankfurter API for real‑time exchange rates.
-argcomplete for shell completion magic.
-All contributors and users who make this project better.
+* Frankfurter API for real‑time exchange rates.
+* argcomplete for shell completion magic.
+* All contributors and users who make this project better.
+
 Happy converting! 🚀

@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please email **davide.ferigato@example.com** (replace with your actual email). Do **not** open a public issue.
+If you discover a security vulnerability, please contact me. Do **not** open a public issue.

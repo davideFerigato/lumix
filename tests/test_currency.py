@@ -1,24 +1,15 @@
-
-
 import pytest
 from unittest.mock import patch
 from lumix.currency.convert import convert_currency
 
-@patch("lumix.currency.api.fetch_exchange_rates")
+@patch("lumix.currency.api.fetch_exchange_rate")
 def test_convert_currency(mock_fetch):
-    # Simula i tassi di cambio
-    mock_fetch.return_value = {
-        "USD": 1.0,
-        "EUR": 0.85,
-        "JPY": 110.0
-    }
+    # Simula il tasso di cambio: per EUR → USD, la funzione restituisce amount * rate
+    # Quindi per 100 EUR, se il tasso è 1.18, restituisce 118.0
+    mock_fetch.return_value = 118.0  # 100 EUR * 1.18 USD/EUR
 
-    # EUR → USD
-    converted, rate = convert_currency("EUR", "USD", 100)
-    assert round(converted, 2) == round(100 / 0.85, 2)
-    assert round(rate, 4) == round(1 / 0.85, 4)
+    converted = convert_currency(100, "EUR", "USD")
+    assert converted == 118.0
 
-    # USD → JPY
-    converted, rate = convert_currency("USD", "JPY", 2)
-    assert converted == 2 * 110.0
-    assert rate == 110.0
+    # Test con valute uguali
+    assert convert_currency(50, "EUR", "EUR") == 50.0

@@ -2,7 +2,6 @@
 Database di unità di misura con simbolo, nome e tipo.
 """
 
-# Struttura: per ogni tipo, una lista di unità con simbolo e nome
 UNITS_DB = {
     "power": [
         {"symbol": "W", "name": "watt"},
@@ -34,7 +33,7 @@ UNITS_DB = {
         {"symbol": "min", "name": "minute"},
         {"symbol": "h", "name": "hour"},
         {"symbol": "d", "name": "day"},
-        {"symbol": "w", "name": "week"},
+        {"symbol": "wk", "name": "week"},   # cambiato da 'w' a 'wk' per evitare conflitto con watt
     ],
     "temperature": [
         {"symbol": "°C", "name": "degree Celsius"},
@@ -110,13 +109,9 @@ for unit_type, units in UNITS_DB.items():
 def get_info_by_symbol(symbol: str) -> dict:
     """Restituisce le informazioni (nome, tipo) per un dato simbolo (case‑insensitive)."""
     key = symbol.lower()
-    if key in SYMBOL_TO_INFO:
-        return SYMBOL_TO_INFO[key]
-    return None
+    return SYMBOL_TO_INFO.get(key)
 
 def get_info_by_name(name: str) -> dict:
     """Restituisce le informazioni (simbolo, tipo) per un dato nome (case‑insensitive)."""
     key = name.lower()
-    if key in NAME_TO_INFO:
-        return NAME_TO_INFO[key]
-    return None
+    return NAME_TO_INFO.get(key)

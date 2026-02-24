@@ -1,20 +1,20 @@
-
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "lumix"
-version = "0.1.0"
-description = "Multilingual, modular CLI converter"
+version = "0.2.0"
+description = "Modular, multilingual CLI converter for units, currencies, and more"
 authors = [
-    { name="Davide Ferigato", email="your@email.com" }
+    { name="Davide Ferigato", email="davide.ferigato@example.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "requests",
-    "argcomplete"
+    "argcomplete",
+    "pytz"
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -28,7 +28,6 @@ license = { text = "MIT" }
 
 [project.scripts]
 lumix = "lumix.cli.main:run_cli"
-
 
 [tool.setuptools.packages.find]
 include = ["lumix", "lumix.*"]

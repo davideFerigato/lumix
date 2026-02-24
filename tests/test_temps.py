@@ -1,11 +1,11 @@
-from lumix.temps.convert import c_to_f, f_to_c
+from lumix.temps.convert import convert
 
 def test_c_to_f():
-    assert c_to_f(0) == 32
-    assert c_to_f(100) == 212
-    assert round(c_to_f(-40), 2) == -40
+    assert convert(0, 'C', 'F') == 32
+    assert convert(100, 'C', 'F') == 212
+    assert round(convert(-40, 'C', 'F'), 2) == -40
 
 def test_f_to_c():
-    assert f_to_c(32) == 0
-    assert f_to_c(212) == 100
-    assert round(f_to_c(-40), 2) == -40
+    assert convert(32, 'F', 'C') == 0
+    assert convert(212, 'F', 'C') == 100
+    assert round(convert(-40, 'F', 'C'), 2) == -40

@@ -3,7 +3,7 @@ from datetime import datetime
 FORMAT_MAP = {
     'us': '%m/%d/%Y',      # MM/DD/YYYY
     'iso': '%Y-%m-%d',
-    'eu': '%d/%m/%Y',       # DD/MM/YYYY
+    'eu': '%d/%m/%Y',      # DD/MM/YYYY
     'jp': '%Y年%m月%d日',
 }
 

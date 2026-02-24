@@ -4,13 +4,11 @@ Modulo per conversione temperature.
 Definisce la funzione convert(src_unit, dst_unit, val) che:
   - Riceve src_unit e dst_unit ('C', 'F', 'K'), e val come stringa (con punto come separatore).
   - Converte val in float, esegue la conversione appropriata.
-  - Restituisce il risultato formattato a 2 decimali, colorato di verde.
-Include anche un main per esecuzione diretta, che gestisce virgola/punto e stampa il risultato completo.
+  - Restituisce il risultato formattato a 2 decimali.
 """
 import sys
 
 _VALID_UNITS = {'C', 'F', 'K'}
-
 
 def convert(src, dst, val):
     """
@@ -22,7 +20,7 @@ def convert(src, dst, val):
         val (str or float): valore numerico (se stringa, deve usare il punto come separatore).
 
     Returns:
-        str: valore convertito formattato a due decimali e colorato di verde,
+        str: valore convertito formattato a due decimali,
              oppure None se input non valido o combinazione non supportata.
     """
     # Validazione unità
@@ -55,6 +53,4 @@ def convert(src, dst, val):
         return None
 
     # Formatta con due decimali
-    formatted = f"{result:.2f}"
-    # Ritorna stringa non colorata
-    return formatted
+    return f"{result:.2f}"

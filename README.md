@@ -7,7 +7,7 @@
 [![Tests](https://github.com/davideFerigato/lumix/actions/workflows/tests.yml/badge.svg)](https://github.com/davideFerigato/lumix/actions/workflows/tests.yml)
 
 **Lumix** is a **modular**, **multilingual** command-line converter for physical units, digital data, time, security tools, and creative utilities.  
-Designed to be **easily extensible**, it features **shell autocompletion** and an **optional GUI** – all in one sleek package.
+Designed to be **easily extensible**, it features **shell autocompletion** – all in one sleek package.
 
 🌐 **Supported languages:** English, Italian, French, Spanish, Japanese.  
 ⚙️ **Modular core:** add your own converters in minutes.  

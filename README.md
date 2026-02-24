@@ -11,7 +11,6 @@ Designed to be **easily extensible**, it features **shell autocompletion** – a
 
 🌐 **Supported languages:** English, Italian, French, Spanish, Japanese.  
 ⚙️ **Modular core:** add your own converters in minutes.  
-🖥️ **Optional GUI** (Tkinter) for those who prefer point‑and‑click.
 
 ---
 
@@ -23,7 +22,6 @@ Designed to be **easily extensible**, it features **shell autocompletion** – a
 - **⌨️ Shell autocompletion** – Works with bash and zsh via `argcomplete`.
 - **🐳 Docker‑ready** – Run Lumix anywhere without installing dependencies.
 - **🧪 Fully tested** – High test coverage with `pytest`.
-- **🖥️ Optional GUI** – A simple Tkinter interface (in development).
 
 ---
 
